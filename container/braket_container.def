@@ -1,0 +1,35 @@
+Bootstrap: docker
+From: ubuntu:26.04
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+
+    apt-get -y update
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        g++ \
+        cmake \
+        make \
+        git \
+        ca-certificates \
+        libboost-all-dev \
+        openmpi-bin \
+        libopenmpi-dev \
+        wget \
+        time
+
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+    git clone --recursive https://github.com/jhpc-quantum/RIKEN-braket.git /opt/RIKEN-braket
+    cd /opt/RIKEN-braket/bra
+    make nompi
+
+%environment
+
+%runscript
+    cd /opt/RIKEN-braket/bra
+    time ./bin/bra -f qcx/hadamards08.qcx
+
+%labels
+    Author voliva-esp
