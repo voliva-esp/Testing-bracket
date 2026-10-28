@@ -16,20 +16,27 @@ From: ubuntu:26.04
         openmpi-bin \
         libopenmpi-dev \
         wget \
-        time
+        time \
+        python3 \
+        python3-pip
 
     apt-get clean
     rm -rf /var/lib/apt/lists/*
 
     git clone --recursive https://github.com/jhpc-quantum/RIKEN-braket.git /opt/RIKEN-braket
     cd /opt/RIKEN-braket/bra
+    python3 -m pip install --break-system-packages -r qcx/requirements.txt
     make nompi
 
 %environment
 
 %runscript
-    cd /opt/RIKEN-braket/bra
-    time ./bin/bra -f qcx/hadamards08.qcx
+    echo "First circuit"
+    /opt/RIKEN-braket/bra/bin/bra -f /opt/RIKEN-braket/bra/qcx/hadamards08.qcx
+    echo "Second circuit"
+    python3 /opt/RIKEN-braket/bra/qcx/qasm2qcx.py ../circuits/q3_qft_qec_20.qasm > circuit.qcx
+    echo "DO MEASUREMENT" >> circuit.qcx
+    /opt/RIKEN-braket/bra/bin/bra -f circuit.qcx
 
 %labels
     Author voliva-esp
