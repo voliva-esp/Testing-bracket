@@ -26,17 +26,22 @@ From: ubuntu:26.04
     git clone --recursive https://github.com/jhpc-quantum/RIKEN-braket.git /opt/RIKEN-braket
     cd /opt/RIKEN-braket/bra
     python3 -m pip install --break-system-packages -r qcx/requirements.txt
-    make nompi
+    make
 
 %environment
 
 %runscript
     echo "First circuit"
     /opt/RIKEN-braket/bra/bin/bra -f /opt/RIKEN-braket/bra/qcx/hadamards08.qcx
-    echo "Second circuit"
-    python3 /opt/RIKEN-braket/bra/qcx/qasm2qcx.py ../circuits/q3_qft_qec_20.qasm > circuit.qcx
-    echo "DO MEASUREMENT" >> circuit.qcx
-    /opt/RIKEN-braket/bra/bin/bra -f circuit.qcx
+    echo "###########################"
+    for name in "q3_qft_qec_20" "q3_qft_qec_25 "q3_qft_qec_30" "q3_qft_qec_35" "q3_qft_qec_40" "q3_qft_qec_45" "q3_qft_qec_50""; do
+        echo "Ejecutando circuito: $name"
+        python3 /opt/RIKEN-braket/bra/qcx/qasm2qcx.py "../circuits/${name}.qasm" > "${name}.qcx"
+        echo "DO MEASUREMENT" >> "${name}.qcx"
+        time mpiexec -np 16 /opt/RIKEN-braket/bra/bin/bra -f "${name}.qcx"
+        echo "###########################"
+    done
+
 
 %labels
     Author voliva-esp
