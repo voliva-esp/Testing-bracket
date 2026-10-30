@@ -29,19 +29,22 @@ From: ubuntu:26.04
     make
 
 %environment
+    export PATH=/opt/RIKEN-braket/bra/bin:$PATH
 
 %runscript
+    mkdir -p results
+
     echo "First circuit"
     /opt/RIKEN-braket/bra/bin/bra -f /opt/RIKEN-braket/bra/qcx/hadamards08.qcx
     echo "###########################"
-    for name in "q3_qft_qec_20" "q3_qft_qec_25 "q3_qft_qec_30" "q3_qft_qec_35" "q3_qft_qec_40" "q3_qft_qec_45" "q3_qft_qec_50""; do
+
+    for name in "q3_qft_qec_20" "q3_qft_qec_25" "q3_qft_qec_30" "q3_qft_qec_35" "q3_qft_qec_40" "q3_qft_qec_45" "q3_qft_qec_50" "q3_qft_qec_55" "q3_qft_qec_60" "q3_qft_qec_65" "q3_qft_qec_70" "q3_qft_qec_75" "q3_qft_qec_80" "q3_qft_qec_85" "q3_qft_qec_90" "q3_qft_qec_95" "q3_qft_qec_100"; do
         echo "Ejecutando circuito: $name"
-        python3 /opt/RIKEN-braket/bra/qcx/qasm2qcx.py "../circuits/${name}.qasm" > "${name}.qcx"
-        echo "DO MEASUREMENT" >> "${name}.qcx"
-        time mpiexec -np 16 /opt/RIKEN-braket/bra/bin/bra -f "${name}.qcx"
+        python3 /opt/RIKEN-braket/bra/qcx/qasm2qcx.py "circuits/${name}.qasm" > "results/${name}.qcx"
+        echo "DO MEASUREMENT" >> "results/${name}.qcx"
+        time mpiexec -np 16 /opt/RIKEN-braket/bra/bin/bra -f "results/${name}.qcx"
         echo "###########################"
     done
-
 
 %labels
     Author voliva-esp
